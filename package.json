@@ -15,7 +15,8 @@
   "author": "Daniel Gonçalves",
   "license": "MIT",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "test:staged": "yarn test"
   },
   "devDependencies": {
     "@types/jest": "^26.0.3",
