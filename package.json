@@ -1,0 +1,15 @@
+{
+  "name": "clean-ts-api",
+  "version": "1.0.0",
+  "description": "Api with Clean Architecture",
+  "repository": {
+    "url": "https://github.com/minato31/clean-ts-api"
+  },
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["Clean Architecture", "Node", "Typescript", "Api"],
+  "author": "Daniel Gonçalves",
+  "license": "MIT"
+}
