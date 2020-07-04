@@ -1,21 +1,16 @@
 {
   "compilerOptions": {
     "outDir": "dist",
-    "target": "ES2019",                   
+    "target": "ES2019",
     "allowJs": true,
-    "module": "commonjs",                     
-    "strict": true,                           
-    "esModuleInterop": true,                  
-    "skipLibCheck": true,                     
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    "strictNullChecks": true,
+    "strictNullChecks": true
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude":[
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
