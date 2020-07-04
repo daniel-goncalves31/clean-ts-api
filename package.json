@@ -9,7 +9,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["Clean Architecture", "Node", "Typescript", "Api"],
+  "keywords": [
+    "Clean Architecture",
+    "Node",
+    "Typescript",
+    "Api"
+  ],
   "author": "Daniel Gonçalves",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "git-commit-msg-linter": "^2.4.4"
+  }
 }
