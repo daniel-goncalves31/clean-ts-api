@@ -10,7 +10,11 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"]
+    }
   },
   "exclude": ["node_modules"]
 }
