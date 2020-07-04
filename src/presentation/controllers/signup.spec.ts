@@ -10,6 +10,8 @@ interface SutType {
 
 const makeSut = (): SutType => {
   const emailValidatorStub = mock<EmailValidator>()
+  emailValidatorStub.isValid.mockReturnValue(true)
+
   const sut = new SignUpController(emailValidatorStub)
 
   return {
@@ -72,7 +74,9 @@ describe('SignUp Controller', () => {
     }
     const httpResponse = sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new MissingParamError('passwordConfirmation'))
+    expect(httpResponse.body).toEqual(
+      new MissingParamError('passwordConfirmation')
+    )
   })
 
   test('Should return 400 if an invalid email is provided', () => {
@@ -102,7 +106,9 @@ describe('SignUp Controller', () => {
       }
     }
     sut.handle(httpRequest)
-    expect(emailValidatorStub.isValid).toHaveBeenCalledWith('any_email@mail.com')
+    expect(emailValidatorStub.isValid).toHaveBeenCalledWith(
+      'any_email@mail.com'
+    )
   })
 
   test('Should return 500 if EmailValidator throws', () => {
