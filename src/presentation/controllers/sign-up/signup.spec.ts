@@ -1,8 +1,7 @@
 import { SignUpController } from './signup'
-import { EmailValidator } from '../protocols/email-validator'
 import { mock, MockProxy } from 'jest-mock-extended'
-import { MissingParamError, InvalidParamError, ServerError } from '../errors'
-import { AddAccount } from '@/domain/usecases/add-account'
+import { MissingParamError, InvalidParamError, ServerError } from '../../errors'
+import { AddAccount, EmailValidator } from './signup-protocols'
 
 interface SutType {
   sut: SignUpController
