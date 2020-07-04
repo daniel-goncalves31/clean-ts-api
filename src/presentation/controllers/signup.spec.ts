@@ -2,21 +2,32 @@ import { SignUpController } from './signup'
 import { EmailValidator } from '../protocols/email-validator'
 import { mock, MockProxy } from 'jest-mock-extended'
 import { MissingParamError, InvalidParamError, ServerError } from '../errors'
+import { AddAccount } from '@/domain/usecases/add-account'
 
 interface SutType {
   sut: SignUpController
   emailValidatorStub: MockProxy<EmailValidator>
+  addAccountStub: MockProxy<AddAccount>
 }
 
 const makeSut = (): SutType => {
   const emailValidatorStub = mock<EmailValidator>()
   emailValidatorStub.isValid.mockReturnValue(true)
 
-  const sut = new SignUpController(emailValidatorStub)
+  const addAccountStub = mock<AddAccount>()
+  addAccountStub.add.mockReturnValue({
+    id: 'any_id',
+    name: 'any_name',
+    email: 'any_email@email.com',
+    password: 'any_password'
+  })
+
+  const sut = new SignUpController(emailValidatorStub, addAccountStub)
 
   return {
     sut,
-    emailValidatorStub
+    emailValidatorStub,
+    addAccountStub
   }
 }
 
@@ -145,5 +156,24 @@ describe('SignUp Controller', () => {
     expect(httpResponse.body).toEqual(
       new InvalidParamError('passwordConfirmation')
     )
+  })
+
+  test('Should call AddAccount usecase with correct values', () => {
+    const { sut, addAccountStub } = makeSut()
+
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        email: 'any_email@mail.com',
+        password: 'any_password',
+        passwordConfirmation: 'any_password'
+      }
+    }
+    sut.handle(httpRequest)
+    expect(addAccountStub.add).toHaveBeenCalledWith({
+      name: 'any_name',
+      email: 'any_email@mail.com',
+      password: 'any_password'
+    })
   })
 })
