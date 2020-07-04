@@ -16,6 +16,7 @@
   "license": "MIT",
   "scripts": {
     "test": "jest --passWithNoTests",
+    "test:unit": "yarn test --watch",
     "test:staged": "yarn test"
   },
   "devDependencies": {
