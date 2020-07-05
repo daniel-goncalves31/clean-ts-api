@@ -74,5 +74,19 @@ describe('Db Add Account', () => {
         password: 'hashed_password'
       })
     })
+
+    test('should throw if AddAccountRespository throws', async () => {
+      const { sut, addAccountRepositoryStub } = makeSut()
+      addAccountRepositoryStub.add.mockImplementationOnce(() => {
+        throw new Error()
+      })
+
+      const result = sut.add({
+        name: 'valid_name',
+        email: 'valid_email',
+        password: 'valid_password'
+      })
+      await expect(result).rejects.toThrow()
+    })
   })
 })
