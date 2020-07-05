@@ -1,7 +1,6 @@
 import { MockProxy, mock } from 'jest-mock-extended'
-import { Encrypter } from './db-add-account-protocols'
+import { Encrypter, AddAccountRepository } from './db-add-account-protocols'
 import { DbAddAccount } from './db-add-account'
-import { AddAccountRepository } from '@/data/protocols/add-account-repository'
 
 interface SutType {
   sut: DbAddAccount
