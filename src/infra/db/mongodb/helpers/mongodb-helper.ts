@@ -2,6 +2,7 @@ import { MongoClient, Collection } from 'mongodb'
 
 export class MongoDbHelper {
   private client: MongoClient | null = null
+  private uri: string = ''
   private static _instance: MongoDbHelper
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -15,13 +16,17 @@ export class MongoDbHelper {
   }
 
   async connect (uri: string): Promise<void> {
+    this.uri = uri
     this.client = await MongoClient.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true
     })
   }
 
-  getCollection (collectionName: string): Collection {
+  async getCollection (collectionName: string): Promise<Collection> {
+    if (!this.client?.isConnected()) {
+      await this.connect(this.uri)
+    }
     return this.client?.db().collection(collectionName) as any
   }
 

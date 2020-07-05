@@ -23,7 +23,10 @@ describe('AccountMongoRepository', () => {
   })
 
   afterEach(async () => {
-    await MongoDbHelper.instance.getCollection('accounts').deleteMany({})
+    const accountCollection = await MongoDbHelper.instance.getCollection(
+      'accounts'
+    )
+    await accountCollection.deleteMany({})
   })
 
   test('should return an account on success', async () => {

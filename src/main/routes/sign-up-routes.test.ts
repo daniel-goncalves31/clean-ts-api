@@ -13,7 +13,9 @@ describe('SignUp Routes', () => {
   })
 
   afterEach(async () => {
-    const accountCollection = MongoDbHelper.instance.getCollection('accounts')
+    const accountCollection = await MongoDbHelper.instance.getCollection(
+      'accounts'
+    )
     await accountCollection.deleteMany({})
   })
 
