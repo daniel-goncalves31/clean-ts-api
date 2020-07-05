@@ -18,7 +18,7 @@ const makeSut = (): SutType => {
 }
 
 describe('Db Add Account', () => {
-  test('should call encrypter with correct password', async () => {
+  test('should call Encrypter with correct password', async () => {
     const { sut, encrypterStub } = makeSut()
 
     const accountData = {
@@ -28,5 +28,20 @@ describe('Db Add Account', () => {
     }
     await sut.add(accountData)
     expect(encrypterStub.encrypt).toBeCalledWith('valid_password')
+  })
+
+  test('should throw if Encrypter throws', async () => {
+    const { sut, encrypterStub } = makeSut()
+    encrypterStub.encrypt.mockImplementationOnce(() => {
+      throw new Error()
+    })
+
+    const accountData = {
+      name: 'valid_name',
+      email: 'valid_email',
+      password: 'valid_password'
+    }
+    const result = sut.add(accountData)
+    await expect(result).rejects.toThrow()
   })
 })
