@@ -78,6 +78,6 @@ describe('LogDecorator', () => {
     )
     await sut.handle(makeFakeRequest())
 
-    expect(logErrorRepository.log).toHaveBeenCalledWith(fakeError.stack)
+    expect(logErrorRepository.logError).toHaveBeenCalledWith(fakeError.stack)
   })
 })
