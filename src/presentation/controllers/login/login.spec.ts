@@ -1,7 +1,7 @@
 import { LoginController } from './login'
 import { HttpRequest, EmailValidator } from '../sign-up/signup-protocols'
 import { badRequest } from '../../helpers/http-helpers'
-import { MissingParamError } from '../../errors'
+import { MissingParamError, InvalidParamError } from '../../errors'
 import { MockProxy, mock } from 'jest-mock-extended'
 
 interface SutType {
@@ -11,6 +11,8 @@ interface SutType {
 
 const makeSut = (): SutType => {
   const emailValidatorStub = mock<EmailValidator>()
+  emailValidatorStub.isValid.mockReturnValue(true)
+
   const sut = new LoginController(emailValidatorStub)
 
   return {
@@ -46,19 +48,36 @@ describe('LoginController', () => {
     expect(httpResponse).toEqual(badRequest(new MissingParamError('password')))
   })
 
-  test('should call EmailValidator with correct email', async () => {
-    const { sut, emailValidatorStub } = makeSut()
+  describe('Email Validator', () => {
+    test('should call EmailValidator with correct email', async () => {
+      const { sut, emailValidatorStub } = makeSut()
 
-    const httpRequest: HttpRequest = {
-      body: {
-        email: 'any_email@email.com',
-        password: 'any_password'
+      const httpRequest: HttpRequest = {
+        body: {
+          email: 'any_email@email.com',
+          password: 'any_password'
+        }
       }
-    }
 
-    await sut.handle(httpRequest)
-    expect(emailValidatorStub.isValid).toHaveBeenCalledWith(
-      httpRequest.body.email
-    )
+      await sut.handle(httpRequest)
+      expect(emailValidatorStub.isValid).toHaveBeenCalledWith(
+        httpRequest.body.email
+      )
+    })
+
+    test('should returns 400 if an invalid email is provided', async () => {
+      const { sut, emailValidatorStub } = makeSut()
+      emailValidatorStub.isValid.mockReturnValueOnce(false)
+
+      const httpRequest: HttpRequest = {
+        body: {
+          email: 'any_email@email.com',
+          password: 'any_password'
+        }
+      }
+
+      const httpResponse = await sut.handle(httpRequest)
+      expect(httpResponse).toEqual(badRequest(new InvalidParamError('email')))
+    })
   })
 })
