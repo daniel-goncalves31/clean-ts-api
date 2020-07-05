@@ -42,10 +42,13 @@
     "jest-mock-extended": "^1.0.9",
     "lint-staged": "^10.2.11",
     "sucrase": "^3.15.0",
+    "supertest": "^4.0.2",
     "ts-jest": "^26.1.1",
     "typescript": "^3.9.6"
   },
   "dependencies": {
+    "-": "^0.0.1",
+    "@types/supertest": "^2.0.10",
     "bcrypt": "^5.0.0",
     "express": "^4.17.1",
     "mongodb": "^3.5.9",
