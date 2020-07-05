@@ -25,6 +25,11 @@ export class MongoDbHelper {
     return this.client?.db().collection(collectionName) as any
   }
 
+  map (collection: any): any {
+    const { _id, ...collectionWithoutId } = collection
+    return { ...collectionWithoutId, id: _id }
+  }
+
   async disconnect (): Promise<void> {
     await this.client?.close()
   }
