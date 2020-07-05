@@ -14,8 +14,8 @@ export class MongoDbHelper {
     return MongoDbHelper._instance
   }
 
-  async connect (): Promise<void> {
-    this.client = await MongoClient.connect(process.env.MONGO_URL as any, {
+  async connect (uri: string): Promise<void> {
+    this.client = await MongoClient.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true
     })

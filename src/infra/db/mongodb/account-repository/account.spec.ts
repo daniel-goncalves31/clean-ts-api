@@ -15,7 +15,7 @@ const makeSut = (): SutType => {
 
 describe('AccountMongoRepository', () => {
   beforeAll(async () => {
-    await MongoDbHelper.instance.connect()
+    await MongoDbHelper.instance.connect(process.env.MONGO_URL as any)
   })
 
   afterAll(async () => {
