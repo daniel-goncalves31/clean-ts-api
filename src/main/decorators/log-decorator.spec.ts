@@ -1,10 +1,17 @@
 import { mock, MockProxy } from 'jest-mock-extended'
-import { Controller, HttpResponse, HttpRequest } from '@/presentation/protocols'
+import {
+  Controller,
+  HttpResponse,
+  HttpRequest
+} from '../../presentation/protocols'
 import { LogControllerDecorator } from './log-decorator'
+import { LogErrorRepository } from '../../data/protocols/log-error-repository'
+import { serverError } from '../../presentation/helpers/http-helpers'
 
 interface SutType {
   sut: LogControllerDecorator
   controllerStub: MockProxy<Controller>
+  logErrorRepository: MockProxy<LogErrorRepository>
 }
 
 const makeSut = (): SutType => {
@@ -19,11 +26,14 @@ const makeSut = (): SutType => {
     return Promise.resolve(httpResponse)
   })
 
-  const sut = new LogControllerDecorator(controllerStub)
+  const logErrorRepository = mock<LogErrorRepository>()
+
+  const sut = new LogControllerDecorator(controllerStub, logErrorRepository)
 
   return {
     sut,
-    controllerStub
+    controllerStub,
+    logErrorRepository
   }
 }
 
@@ -59,5 +69,26 @@ describe('LogDecorator', () => {
         name: 'valid_name'
       }
     })
+  })
+
+  test('should call LogRepositoryError with correct error if controller returns a server error', async () => {
+    const { sut, controllerStub, logErrorRepository } = makeSut()
+    const httpRequest: HttpRequest = {
+      body: {
+        email: 'any_mail@mail.com',
+        name: 'any_name',
+        password: 'any_password',
+        passwordConfirmation: 'any_password'
+      }
+    }
+    const fakeError = new Error()
+    fakeError.stack = 'any_stack'
+
+    controllerStub.handle.mockReturnValue(
+      Promise.resolve(serverError(fakeError))
+    )
+    await sut.handle(httpRequest)
+
+    expect(logErrorRepository.log).toHaveBeenCalledWith(fakeError.stack)
   })
 })
