@@ -1,6 +1,21 @@
 import { MockProxy, mock } from 'jest-mock-extended'
 import { Encrypter, AddAccountRepository } from './db-add-account-protocols'
 import { DbAddAccount } from './db-add-account'
+import { AccountModel } from '../../../domain/models/account-model'
+import { AddAccountModel } from '../../../domain/models/add-account-model'
+
+const makeFakeAccount = (): AccountModel => ({
+  id: 'valid_id',
+  name: 'valid_name',
+  email: 'valid_email',
+  password: 'hashed_password'
+})
+
+const makeFakeAccountData = (): AddAccountModel => ({
+  name: 'valid_name',
+  email: 'valid_email',
+  password: 'valid_password'
+})
 
 interface SutType {
   sut: DbAddAccount
@@ -14,12 +29,7 @@ const makeSut = (): SutType => {
 
   const addAccountRepositoryStub = mock<AddAccountRepository>()
   addAccountRepositoryStub.add.mockReturnValue(
-    Promise.resolve({
-      id: 'valid_id',
-      name: 'valid_name',
-      email: 'valid_email@email.com',
-      password: 'hashed_password'
-    })
+    Promise.resolve(makeFakeAccount())
   )
 
   const sut = new DbAddAccount(encrypterStub, addAccountRepositoryStub)
@@ -36,11 +46,7 @@ describe('Db Add Account', () => {
     test('should call Encrypter with correct password', async () => {
       const { sut, encrypterStub } = makeSut()
 
-      await sut.add({
-        name: 'valid_name',
-        email: 'valid_email',
-        password: 'valid_password'
-      })
+      await sut.add(makeFakeAccountData())
       expect(encrypterStub.encrypt).toBeCalledWith('valid_password')
     })
 
@@ -50,11 +56,7 @@ describe('Db Add Account', () => {
         throw new Error()
       })
 
-      const result = sut.add({
-        name: 'valid_name',
-        email: 'valid_email',
-        password: 'valid_password'
-      })
+      const result = sut.add(makeFakeAccountData())
       await expect(result).rejects.toThrow()
     })
   })
@@ -81,28 +83,15 @@ describe('Db Add Account', () => {
         throw new Error()
       })
 
-      const result = sut.add({
-        name: 'valid_name',
-        email: 'valid_email',
-        password: 'valid_password'
-      })
+      const result = sut.add(makeFakeAccountData())
       await expect(result).rejects.toThrow()
     })
 
     test('should return an account on success', async () => {
       const { sut } = makeSut()
 
-      const result = await sut.add({
-        name: 'valid_name',
-        email: 'valid_email',
-        password: 'valid_password'
-      })
-      await expect(result).toEqual({
-        id: 'valid_id',
-        name: 'valid_name',
-        email: 'valid_email@email.com',
-        password: 'hashed_password'
-      })
+      const result = await sut.add(makeFakeAccountData())
+      await expect(result).toEqual(makeFakeAccount())
     })
   })
 })
