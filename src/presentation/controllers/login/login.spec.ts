@@ -4,6 +4,13 @@ import { badRequest } from '../../helpers/http-helpers'
 import { MissingParamError, InvalidParamError } from '../../errors'
 import { MockProxy, mock } from 'jest-mock-extended'
 
+const makeFakeRequest = (): HttpRequest => ({
+  body: {
+    email: 'any_email@email.com',
+    password: 'any_password'
+  }
+})
+
 interface SutType {
   sut: LoginController
   emailValidatorStub: MockProxy<EmailValidator>
@@ -52,16 +59,9 @@ describe('LoginController', () => {
     test('should call EmailValidator with correct email', async () => {
       const { sut, emailValidatorStub } = makeSut()
 
-      const httpRequest: HttpRequest = {
-        body: {
-          email: 'any_email@email.com',
-          password: 'any_password'
-        }
-      }
-
-      await sut.handle(httpRequest)
+      await sut.handle(makeFakeRequest())
       expect(emailValidatorStub.isValid).toHaveBeenCalledWith(
-        httpRequest.body.email
+        makeFakeRequest().body.email
       )
     })
 
@@ -69,14 +69,7 @@ describe('LoginController', () => {
       const { sut, emailValidatorStub } = makeSut()
       emailValidatorStub.isValid.mockReturnValueOnce(false)
 
-      const httpRequest: HttpRequest = {
-        body: {
-          email: 'any_email@email.com',
-          password: 'any_password'
-        }
-      }
-
-      const httpResponse = await sut.handle(httpRequest)
+      const httpResponse = await sut.handle(makeFakeRequest())
       expect(httpResponse).toEqual(badRequest(new InvalidParamError('email')))
     })
   })
