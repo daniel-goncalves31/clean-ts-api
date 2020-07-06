@@ -108,5 +108,15 @@ describe('LoginController', () => {
       const httpResponse = await sut.handle(makeFakeRequest())
       expect(httpResponse).toEqual(unauthorized())
     })
+
+    test('should return 500 if Authentication throws', async () => {
+      const { sut, authenticationStub } = makeSut()
+      authenticationStub.auth.mockImplementationOnce(() => {
+        throw new Error()
+      })
+
+      const httpResponse = await sut.handle(makeFakeRequest())
+      expect(httpResponse).toEqual(serverError(new Error()))
+    })
   })
 })
