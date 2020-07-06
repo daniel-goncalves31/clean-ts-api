@@ -3,7 +3,8 @@ import { HttpRequest, EmailValidator } from '../sign-up/signup-protocols'
 import {
   badRequest,
   serverError,
-  unauthorized
+  unauthorized,
+  ok
 } from '../../helpers/http-helpers'
 import { MissingParamError, InvalidParamError } from '../../errors'
 import { MockProxy, mock } from 'jest-mock-extended'
@@ -27,6 +28,7 @@ const makeSut = (): SutType => {
   emailValidatorStub.isValid.mockReturnValue(true)
 
   const authenticationStub = mock<Authentication>()
+  authenticationStub.auth.mockReturnValue(Promise.resolve('any_token'))
 
   const sut = new LoginController(emailValidatorStub, authenticationStub)
 
@@ -117,6 +119,13 @@ describe('LoginController', () => {
 
       const httpResponse = await sut.handle(makeFakeRequest())
       expect(httpResponse).toEqual(serverError(new Error()))
+    })
+
+    test('should return 200 if valid credentials are provided', async () => {
+      const { sut } = makeSut()
+
+      const httpResponse = await sut.handle(makeFakeRequest())
+      expect(httpResponse).toEqual(ok({ accessToken: 'any_token' }))
     })
   })
 })
