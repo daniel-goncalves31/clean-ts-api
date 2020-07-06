@@ -1,6 +1,6 @@
 import { LoginController } from './login'
 import { HttpRequest, EmailValidator } from '../sign-up/signup-protocols'
-import { badRequest } from '../../helpers/http-helpers'
+import { badRequest, serverError } from '../../helpers/http-helpers'
 import { MissingParamError, InvalidParamError } from '../../errors'
 import { MockProxy, mock } from 'jest-mock-extended'
 
@@ -71,6 +71,16 @@ describe('LoginController', () => {
 
       const httpResponse = await sut.handle(makeFakeRequest())
       expect(httpResponse).toEqual(badRequest(new InvalidParamError('email')))
+    })
+
+    test('should throw if EmailValidator throws', async () => {
+      const { sut, emailValidatorStub } = makeSut()
+      emailValidatorStub.isValid.mockImplementationOnce(() => {
+        throw new Error()
+      })
+
+      const httpResponse = await sut.handle(makeFakeRequest())
+      expect(httpResponse).toEqual(serverError(new Error()))
     })
   })
 })
