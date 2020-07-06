@@ -6,9 +6,13 @@ import {
 } from '../sign-up/signup-protocols'
 import { badRequest, serverError } from '../../helpers/http-helpers'
 import { MissingParamError, InvalidParamError } from '../../errors'
+import { Authentication } from '../../../domain/usecases/authentication'
 
 export class LoginController implements Controller {
-  constructor (private readonly emailValidator: EmailValidator) {}
+  constructor (
+    private readonly emailValidator: EmailValidator,
+    private readonly authentication: Authentication
+  ) {}
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     const requiredFields = ['email', 'password']
@@ -20,15 +24,17 @@ export class LoginController implements Controller {
     }
 
     try {
-      const emailIsValid = this.emailValidator.isValid(httpRequest.body.email)
+      const { email, password } = httpRequest.body
+      const emailIsValid = this.emailValidator.isValid(email)
 
       if (!emailIsValid) {
         return badRequest(new InvalidParamError('email'))
       }
 
+      await this.authentication.auth(email, password)
       return {} as any
     } catch (error) {
-      return serverError(new Error())
+      return serverError(error)
     }
   }
 }
