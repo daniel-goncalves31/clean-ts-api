@@ -8,6 +8,7 @@ import {
   HttpRequest
 } from './signup-protocols'
 import { badRequest } from '../../helpers/http-helpers'
+import { Validation } from '@/presentation/helpers/validators/validation'
 
 const makeFakeAccount = (): AccountModel => ({
   id: 'valid_id',
@@ -29,6 +30,7 @@ interface SutType {
   sut: SignUpController
   emailValidatorStub: MockProxy<EmailValidator>
   addAccountStub: MockProxy<AddAccount>
+  validationStub: MockProxy<Validation>
 }
 
 const makeSut = (): SutType => {
@@ -38,12 +40,19 @@ const makeSut = (): SutType => {
   const addAccountStub = mock<AddAccount>()
   addAccountStub.add.mockReturnValue(Promise.resolve(makeFakeAccount()))
 
-  const sut = new SignUpController(emailValidatorStub, addAccountStub)
+  const validationStub = mock<Validation>()
+
+  const sut = new SignUpController(
+    emailValidatorStub,
+    addAccountStub,
+    validationStub
+  )
 
   return {
     sut,
     emailValidatorStub,
-    addAccountStub
+    addAccountStub,
+    validationStub
   }
 }
 
@@ -203,6 +212,14 @@ describe('SignUp Controller', () => {
         email: 'valid_email@email.com',
         password: 'valid_password'
       })
+    })
+  })
+
+  describe('Validation', () => {
+    test('should call Validation with correct value', async () => {
+      const { sut, validationStub } = makeSut()
+      await sut.handle(makeFakeRequest())
+      expect(validationStub.validate).toBeCalledWith(makeFakeRequest().body)
     })
   })
 })
