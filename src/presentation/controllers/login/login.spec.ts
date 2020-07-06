@@ -3,6 +3,7 @@ import { HttpRequest, EmailValidator } from '../sign-up/signup-protocols'
 import { badRequest, serverError } from '../../helpers/http-helpers'
 import { MissingParamError, InvalidParamError } from '../../errors'
 import { MockProxy, mock } from 'jest-mock-extended'
+import { Authentication } from '../../../domain/usecases/authentication'
 
 const makeFakeRequest = (): HttpRequest => ({
   body: {
@@ -14,17 +15,21 @@ const makeFakeRequest = (): HttpRequest => ({
 interface SutType {
   sut: LoginController
   emailValidatorStub: MockProxy<EmailValidator>
+  authenticationStub: MockProxy<Authentication>
 }
 
 const makeSut = (): SutType => {
   const emailValidatorStub = mock<EmailValidator>()
   emailValidatorStub.isValid.mockReturnValue(true)
 
-  const sut = new LoginController(emailValidatorStub)
+  const authenticationStub = mock<Authentication>()
+
+  const sut = new LoginController(emailValidatorStub, authenticationStub)
 
   return {
     sut,
-    emailValidatorStub
+    emailValidatorStub,
+    authenticationStub
   }
 }
 
@@ -81,6 +86,15 @@ describe('LoginController', () => {
 
       const httpResponse = await sut.handle(makeFakeRequest())
       expect(httpResponse).toEqual(serverError(new Error()))
+    })
+  })
+
+  describe('Authentication', () => {
+    test('should call Authentication with correct values', async () => {
+      const { sut, authenticationStub } = makeSut()
+      const { email, password } = makeFakeRequest().body
+      await sut.handle(makeFakeRequest())
+      expect(authenticationStub.auth).toBeCalledWith(email, password)
     })
   })
 })
