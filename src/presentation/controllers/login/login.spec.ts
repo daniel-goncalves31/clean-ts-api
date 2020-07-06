@@ -1,6 +1,10 @@
 import { LoginController } from './login'
 import { HttpRequest, EmailValidator } from '../sign-up/signup-protocols'
-import { badRequest, serverError } from '../../helpers/http-helpers'
+import {
+  badRequest,
+  serverError,
+  unauthorized
+} from '../../helpers/http-helpers'
 import { MissingParamError, InvalidParamError } from '../../errors'
 import { MockProxy, mock } from 'jest-mock-extended'
 import { Authentication } from '../../../domain/usecases/authentication'
@@ -95,6 +99,14 @@ describe('LoginController', () => {
       const { email, password } = makeFakeRequest().body
       await sut.handle(makeFakeRequest())
       expect(authenticationStub.auth).toBeCalledWith(email, password)
+    })
+
+    test('should return 401 if invalid credentials are provided', async () => {
+      const { sut, authenticationStub } = makeSut()
+      authenticationStub.auth.mockReturnValueOnce(Promise.resolve(null))
+
+      const httpResponse = await sut.handle(makeFakeRequest())
+      expect(httpResponse).toEqual(unauthorized())
     })
   })
 })
